@@ -31,6 +31,7 @@ my $build = Module::Build->new(
         'MooseX::Event'             => 0,
         'SDL'                       => 0,
         'Test::More'                => 0,
+        'Time::HiRes'               => 0,
         'UAV::Pilot'                => '>= 0.9',
     },
 

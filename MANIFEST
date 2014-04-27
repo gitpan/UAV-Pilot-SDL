@@ -1,4 +1,5 @@
 Build.PL
+CHANGELOG
 lib/UAV/Pilot/SDL.pm
 lib/UAV/Pilot/SDL/Events.pm
 lib/UAV/Pilot/SDL/Joystick.pm
@@ -17,6 +18,7 @@ META.yml
 ppport.h
 README
 t/001_load.t
+t/002_pod.t
 t/170_sdl_window.t
 typemap
 uav.h

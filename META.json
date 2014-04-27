@@ -32,6 +32,7 @@
             "MooseX::Event" : "0",
             "SDL" : "0",
             "Test::More" : "0",
+            "Time::HiRes" : "0",
             "UAV::Pilot" : ">= 0.9",
             "namespace::autoclean" : "0",
             "perl" : ">= 5.14.0"
@@ -44,7 +45,7 @@
       },
       "UAV::Pilot::SDL" : {
          "file" : "lib/UAV/Pilot/SDL.pm",
-         "version" : "0.1"
+         "version" : "0.2"
       },
       "UAV::Pilot::SDL::Events" : {
          "file" : "lib/UAV/Pilot/SDL/Events.pm"
@@ -77,11 +78,11 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/bsd-license.php"
+         "http://opensource.org/licenses/BSD-3-Clause"
       ],
       "repository" : {
          "url" : "https://github.com/frezik/UAV-Pilot-SDL"
       }
    },
-   "version" : "0.1"
+   "version" : "0.2"
 }

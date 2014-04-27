@@ -1,3 +1,26 @@
+# Copyright (c) 2014  Timm Murray
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
+# 
+#     * Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in the 
+#       documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
 package UAV::Pilot::SDL::Video;
 use v5.14;
 use Moose;
@@ -8,11 +31,14 @@ use SDL::Event;
 use SDL::Events;
 use SDL::Video qw{ :surface :video };
 use SDL::Overlay;
+use Time::HiRes ();
 use UAV::Pilot::SDL::VideoOverlay;
 
 require DynaLoader;
 our @ISA = qw(DynaLoader);
 bootstrap UAV::Pilot::SDL::Video;
+
+with 'UAV::Pilot::Logger';
 
 
 use constant {
@@ -33,6 +59,15 @@ with 'UAV::Pilot::Video::RawHandler';
 has '_last_vid_frame' => (
     is  => 'rw',
     isa => 'Maybe[UAV::Pilot::Video::H264Decoder]',
+);
+has 'frames_processed' => (
+    traits  => ['Number'],
+    is      => 'ro',
+    isa     => 'Int',
+    default => 0,
+    handles => {
+        '_add_frames_processed' => 'add',
+    },
 );
 has '_bg_rect' => (
     is     => 'ro',
@@ -78,6 +113,12 @@ sub add_to_window
     return 1;
 }
 
+sub update_window_rect
+{
+    # Do nothing, since YUV overlay updates the area for us
+    return 1;
+}
+
 
 sub process_raw_frame
 {
@@ -90,6 +131,7 @@ sub process_raw_frame
     }
 
     $self->_last_vid_frame( $decoder );
+    $self->_add_frames_processed( 1 );
     return 1;
 }
 
@@ -121,6 +163,10 @@ sub draw
         
         SDL::Video::update_rects( $window->sdl, $bg_rect );
     }
+
+    $self->_logger->info( 'VIDEO_FRAME_TIMER,DISPLAY,'
+        . $self->frames_processed
+        . ',' . join( ',', Time::HiRes::gettimeofday ) );
 
     return 1;
 }

@@ -1,3 +1,26 @@
+# Copyright (c) 2014  Timm Murray
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
+# 
+#     * Redistributions of source code must retain the above copyright notice, 
+#       this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright 
+#       notice, this list of conditions and the following disclaimer in the 
+#       documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
 package UAV::Pilot::SDL::Window;
 use v5.14;
 use Moose;
@@ -172,6 +195,7 @@ sub process_events
         $self->_origin_y( $child->{origin_y} );
         $self->_drawer( $drawer );
         $drawer->draw( $self );
+        $drawer->update_window_rect( $self );
     }
 
     my $rect = $self->_bg_rect;
@@ -180,7 +204,7 @@ sub process_events
         . ' Y: '      . $rect->y
         . ' Width: '  . $rect->w
         . ' Height: ' . $rect->h );
-    SDL::Video::update_rects( $self->sdl, $self->_bg_rect );
+    #SDL::Video::update_rects( $self->sdl, $self->_bg_rect );
     # Cleanup
     $self->_origin_x( 0 );
     $self->_origin_y( 0 );
@@ -241,6 +265,15 @@ sub draw_rect
     $rect_data->[0] += $self->_origin_x;
     $rect_data->[1] += $self->_origin_y;
     $self->sdl->draw_rect( $rect_data, $color);
+    return 1;
+}
+
+sub update_rect
+{
+    my ($self, $width, $height) = @_;
+    my $rect = SDL::Rect->new( $self->_origin_x, $self->_origin_y, 
+        $width, $height );
+    SDL::Video::update_rects( $self->sdl, $rect );
     return 1;
 }
 
@@ -404,6 +437,12 @@ Draws a circle.  The C<$color> param is an C<SDL::Color> object.
 
     draw_rect( [$x, $y, $width, $height], $color )
 
-Draws a rect.  the C<$color> param is an C<SDL::Color> object.
+Draws a rect.  The C<$color> param is an C<SDL::Color> object.
+
+=head2 update_rect
+
+    update_rect( $width, $height )
+
+Updates the draw area for the active window.
 
 =cut
